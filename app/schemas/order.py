@@ -1,4 +1,5 @@
 # app/schemas/order.py
+from datetime import date
 from pydantic import BaseModel
 from typing import Optional
 
@@ -11,12 +12,23 @@ class OrderBase(BaseModel):
     order_date: str
 
 # Schema for creating an order
-class OrderCreate(OrderBase):
-    pass
+class PurchaseOrderCreate(BaseModel):
+    order_date: date
+    supplier_id: int
+    product_id: int
+    quantity: int
+    total_price: float
 
-# Schema for order response
-class OrderResponse(OrderBase):
+
+class PurchaseOrderResponse(BaseModel):
     id: int
+    order_date: date
+    supplier_id: int
+    supplier_name: str
+    product_id: int
+    product_name: str
+    quantity: int
+    total_price: float
 
     class Config:
         orm_mode = True

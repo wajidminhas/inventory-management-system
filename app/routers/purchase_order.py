@@ -2,10 +2,13 @@
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from app.models import PurchaseOrder, PurchaseOrderItem
-from app.schemas import PurchaseOrderCreate, PurchaseOrderResponse
-from app.database import session
+from app.database import Session
+from app.schemas.order import PurchaseOrderCreate, PurchaseOrderResponse
 
 router = APIRouter()
+
+#create dependency injection for getsession
+session = Session()
 
 # Create Purchase Order
 @router.post("/purchase-orders/", response_model=PurchaseOrderResponse)

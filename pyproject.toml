@@ -10,6 +10,8 @@ python = "^3.10"
 uvicorn = "^0.34.0"
 fastapi = "^0.115.7"
 sqlmodel = "^0.0.22"
+psycopg = {extras = ["binary"], version = "^3.2.4"}
+pydantic = {extras = ["email"], version = "^2.10.6"}
 
 
 [build-system]

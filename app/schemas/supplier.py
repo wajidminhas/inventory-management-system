@@ -9,14 +9,25 @@ class SupplierBase(BaseModel):
     phone: str
     email: Optional[EmailStr] = None
     address: Optional[str] = None
+from pydantic import BaseModel
 
-# Schema for creating a supplier
-class SupplierCreate(SupplierBase):
-    pass
+# Supplier Schemas
+class SupplierCreate(BaseModel):
+    name: str
+    contact_email: str
+    contact_phone: str
+    company_name: str
+    address: str
 
-# Schema for supplier response
-class SupplierResponse(SupplierBase):
+
+class SupplierResponse(BaseModel):
     id: int
+    name: str
+    contact_email: str
+    contact_phone: str
+    company_name: str
+    address: str
 
     class Config:
         orm_mode = True
+

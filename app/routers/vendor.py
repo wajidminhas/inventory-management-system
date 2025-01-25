@@ -1,9 +1,10 @@
 # app/routers/vendor.py
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
+from sqlmodel import Session
 from app.models import Vendor
-from app.schemas import VendorCreate, VendorResponse
-from app.database import session
+from app.database import Session
+from app.schemas.vendor import VendorCreate, VendorResponse
 
 router = APIRouter()
 
@@ -11,7 +12,7 @@ router = APIRouter()
 @router.post("/vendors/", response_model=VendorResponse)
 async def create_vendor(vendor: VendorCreate):
     db_vendor = Vendor(**vendor.dict())
-    session.add(db_vendor)
+    Session.add(db_vendor)
     try:
         session.commit()
         session.refresh(db_vendor)

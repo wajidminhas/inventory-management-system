@@ -61,13 +61,13 @@ class Vendor(SQLModel, table=True):
 
 
 # Supplier Model
-class Supplier(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str = Field(..., max_length=100)
-    contact_person: str = Field(..., max_length=100)
-    phone: str = Field(..., max_length=15)
-    email: Optional[str] = Field(default=None, max_length=100)
-    address: Optional[str] = Field(default=None, max_length=255)
+# class Supplier(SQLModel, table=True):
+#     id: Optional[int] = Field(default=None, primary_key=True)
+#     name: str = Field(..., max_length=100)
+#     contact_person: str = Field(..., max_length=100)
+#     phone: str = Field(..., max_length=15)
+#     email: Optional[str] = Field(default=None, max_length=100)
+#     address: Optional[str] = Field(default=None, max_length=255)
 
 # Purchase Order Model
 class PurchaseOrder(SQLModel, table=True):

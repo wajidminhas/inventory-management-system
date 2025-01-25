@@ -11,12 +11,19 @@ class VendorBase(BaseModel):
     address: Optional[str] = None
 
 # Schema for creating a vendor
-class VendorCreate(VendorBase):
-    pass
+class VendorCreate(BaseModel):
+    name: str
+    contact_email: str
+    contact_phone: str
+    address: str
 
-# Schema for vendor response
-class VendorResponse(VendorBase):
+
+class VendorResponse(BaseModel):
     id: int
+    name: str
+    contact_email: str
+    contact_phone: str
+    address: str
 
     class Config:
         orm_mode = True
