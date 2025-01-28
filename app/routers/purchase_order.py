@@ -1,8 +1,10 @@
 # app/routers/purchase_order.py
-from fastapi import APIRouter, HTTPException
+from sqlmodel import select
+from typing_extensions import Annotated
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from app.models import PurchaseOrder, PurchaseOrderItem
-from app.database import Session
+from app.database import Session, get_session
 from app.schemas.order import PurchaseOrderCreate, PurchaseOrderResponse
 
 router = APIRouter()
@@ -12,8 +14,8 @@ session = Session()
 
 # Create Purchase Order
 @router.post("/purchase-orders/", response_model=PurchaseOrderResponse)
-async def create_purchase_order(purchase_order: PurchaseOrderCreate):
-    db_purchase_order = PurchaseOrder(**purchase_order.dict())
+async def create_purchase_order(purchase_order: PurchaseOrderCreate, session : Annotated[Session, Depends(get_session)]):
+    db_purchase_order = PurchaseOrder(**purchase_order.exec())
     session.add(db_purchase_order)
     try:
         session.commit()
@@ -29,13 +31,13 @@ async def create_purchase_order(purchase_order: PurchaseOrderCreate):
 
 # Get all Purchase Orders
 @router.get("/purchase-orders/", response_model=list[PurchaseOrderResponse])
-async def get_purchase_orders():
-    purchase_orders = session.query(PurchaseOrder).all()
+async def get_purchase_orders(session : Annotated[Session, Depends(get_session)]):
+    purchase_orders = session.exec(PurchaseOrder).all()
     return purchase_orders
 
 # Get Purchase Order by ID
 @router.get("/purchase-orders/{order_id}", response_model=PurchaseOrderResponse)
-async def get_purchase_order(order_id: int):
+async def get_purchase_order(order_id: int, session : Annotated[Session, Depends(get_session)]):
     db_order = session.query(PurchaseOrder).filter(PurchaseOrder.id == order_id).first()
     if db_order is None:
         raise HTTPException(status_code=404, detail="Purchase Order not found")
@@ -43,11 +45,11 @@ async def get_purchase_order(order_id: int):
 
 # Update Purchase Order
 @router.put("/purchase-orders/{order_id}", response_model=PurchaseOrderResponse)
-async def update_purchase_order(order_id: int, purchase_order: PurchaseOrderCreate):
+async def update_purchase_order(order_id: int, purchase_order: PurchaseOrderCreate, session : Annotated[Session, Depends(get_session)]):
     db_order = session.query(PurchaseOrder).filter(PurchaseOrder.id == order_id).first()
     if db_order is None:
         raise HTTPException(status_code=404, detail="Purchase Order not found")
-    for key, value in purchase_order.dict().items():
+    for key, value in purchase_order.exec().items():
         setattr(db_order, key, value)
     try:
         session.commit()
@@ -59,8 +61,8 @@ async def update_purchase_order(order_id: int, purchase_order: PurchaseOrderCrea
 
 # Delete Purchase Order
 @router.delete("/purchase-orders/{order_id}")
-async def delete_purchase_order(order_id: int):
-    db_order = session.query(PurchaseOrder).filter(PurchaseOrder.id == order_id).first()
+async def delete_purchase_order(order_id: int, session : Annotated[Session, Depends(get_session)]):
+    db_order = session.exec(select(PurchaseOrder).filter(PurchaseOrder.id == order_id)).first()
     if db_order is None:
         raise HTTPException(status_code=404, detail="Purchase Order not found")
     try:

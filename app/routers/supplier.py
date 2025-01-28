@@ -1,16 +1,18 @@
 # app/routers/supplier.py
-from fastapi import APIRouter, HTTPException
+from sqlmodel import select
+from typing_extensions import Annotated
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from app.models import Supplier
-from app.database import Session
+from app.database import Session, get_session
 from app.schemas.supplier import SupplierCreate, SupplierResponse
 
 router = APIRouter()
 
 # Create Supplier
 @router.post("/suppliers/", response_model=SupplierResponse)
-async def create_supplier(supplier: SupplierCreate):
-    db_supplier = Supplier(**supplier.dict())
+async def create_supplier(supplier: SupplierCreate, session : Annotated[Session, Depends(get_session)]):
+    db_supplier = Supplier(**supplier.exec())
     Session.add(db_supplier)
     try:
         Session.commit()
@@ -22,22 +24,22 @@ async def create_supplier(supplier: SupplierCreate):
 
 # Get all Suppliers
 @router.get("/suppliers/", response_model=list[SupplierResponse])
-async def get_suppliers():
-    suppliers = Session.query(Supplier).all()
+async def get_suppliers(session : Annotated[Session, Depends(get_session)]):
+    suppliers = Session.exec(Supplier).all()
     return suppliers
 
 # Get Supplier by ID
 @router.get("/suppliers/{supplier_id}", response_model=SupplierResponse)
-async def get_supplier(supplier_id: int):
-    db_supplier = Session.query(Supplier).filter(Supplier.id == supplier_id).first()
+async def get_supplier(supplier_id: int, session : Annotated[Session, Depends(get_session)]):
+    db_supplier = Session.exec(select(Supplier).filter(Supplier.id == supplier_id)).first()
     if db_supplier is None:
         raise HTTPException(status_code=404, detail="Supplier not found")
     return db_supplier
 
 # Update Supplier
 @router.put("/suppliers/{supplier_id}", response_model=SupplierResponse)
-async def update_supplier(supplier_id: int, supplier: SupplierCreate):
-    db_supplier = Session.query(Supplier).filter(Supplier.id == supplier_id).first()
+async def update_supplier(supplier_id: int, supplier: SupplierCreate, session : Annotated[Session, Depends(get_session)]):
+    db_supplier = Session.exec(select(Supplier).filter(Supplier.id == supplier_id)).first()
     if db_supplier is None:
         raise HTTPException(status_code=404, detail="Supplier not found")
     for key, value in supplier.dict().items():
@@ -52,8 +54,8 @@ async def update_supplier(supplier_id: int, supplier: SupplierCreate):
 
 # Delete Supplier
 @router.delete("/suppliers/{supplier_id}")
-async def delete_supplier(supplier_id: int):
-    db_supplier = Session.query(Supplier).filter(Supplier.id == supplier_id).first()
+async def delete_supplier(supplier_id: int, session : Annotated[Session, Depends(get_session)]):
+    db_supplier = Session.exec(select(Supplier).filter(Supplier.id == supplier_id)).first()
     if db_supplier is None:
         raise HTTPException(status_code=404, detail="Supplier not found")
     try:
