@@ -7,6 +7,7 @@ from app.schemas.employee import EmployeeCreate, EmployeeResponse
 
 router = APIRouter(prefix="/employees", tags=["Employees"])
 
+
 @router.post("/", response_model=EmployeeResponse)
 def create_employee(employee: EmployeeCreate, session: Session = Depends(get_session)):
     db_employee = Employee(**employee.dict())

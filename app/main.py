@@ -6,10 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import  engine, SQLModel
 from app.database import create_db_table
 from app.routers import (
+    
     product,
 #     stock,
 #     employee,
-#     order,
+    order,
 #     auth,
 #     vendor,
 #     supplier,
@@ -33,7 +34,7 @@ async def lifespan(app: FastAPI):
     yield
     print("Closing database connection...")
 
-app = FastAPI(lifespan=lifespan, title="Inventry Service API")
+app = FastAPI(lifespan=lifespan, title="Inventory Management Service API")
 # CORS settings (Adjust origins as per your frontend requirements)
 origins = ["http://localhost:3000", "http://localhost:8000"]
 app.add_middleware(
@@ -48,7 +49,7 @@ app.add_middleware(
 app.include_router(product.router, prefix="/api/products", tags=["Products"])
 # app.include_router(stock.router, prefix="/api/stocks", tags=["Stocks"])
 # app.include_router(employee.router, prefix="/api/employees", tags=["Employees"])
-# app.include_router(order.router, prefix="/api/orders", tags=["Orders"])
+app.include_router(order.router, prefix="/api/orders", tags=["Orders"])
 # app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 # app.include_router(vendor.router, prefix="/api/vendors", tags=["Vendors"])
 # app.include_router(supplier.router, prefix="/api/suppliers", tags=["Suppliers"])
